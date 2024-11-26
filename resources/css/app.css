@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+/* Untuk seluruh halaman */
+body {
+  overflow: auto; /* Tetap memungkinkan scrolling */
+  scrollbar-width: none; /* Hilangkan scrollbar di Firefox */
+  -ms-overflow-style: none; /* Hilangkan scrollbar di Internet Explorer */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Hilangkan scrollbar di Chrome, Safari, Opera */
+}
+
+* {
+    scrollbar-width: none;
+}
+  *::-webkit-scrollbar {
+    display: none;
+}
