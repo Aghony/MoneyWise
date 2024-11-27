@@ -1,112 +1,442 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-import Checkbox from '@/Components/Checkbox.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { ref, onMounted } from "vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Eye as EyeIcon, EyeOff as EyeOffIcon } from "lucide-vue-next";
+import AuthenticationCard from "@/Components/AuthenticationCard.vue";
+import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
     terms: false,
 });
 
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+const isAnimationComplete = ref(false);
+const focusedInput = ref(null);
+
+const togglePasswordVisibility = () => {
+    showPassword.value = !showPassword.value;
+};
+
+const toggleConfirmPasswordVisibility = () => {
+    showConfirmPassword.value = !showConfirmPassword.value;
+};
+// Generate particle positions
+const particles = ref([]);
+const generateParticles = () => {
+    particles.value = Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 30 + 10,
+        delay: Math.random() * 3,
+    }));
+};
+
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    form.post(route("register"), {
+        onFinish: () => form.reset("password", "password_confirmation"),
     });
 };
+
+onMounted(() => {
+    generateParticles();
+
+    // Trigger animation after component mount
+    setTimeout(() => {
+        isAnimationComplete.value = true;
+    }, 100);
+});
 </script>
 
+<style scoped>
+/* Animasi Kustom */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+.animate-float {
+    animation: float 4s infinite ease-in-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-fade-in-delay {
+    animation: fadeIn 1s ease-out 0.5s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in {
+    animation: slideIn 1s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-delay {
+    animation: slideIn 1s ease-out 0.3s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-delay-2 {
+    animation: slideIn 1s ease-out 0.6s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-delay-3 {
+    animation: slideIn 1s ease-out 0.9s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-delay-4 {
+    animation: slideIn 1s ease-out 1.2s forwards;
+    opacity: 0;
+}
+
+.animate-shake {
+    animation: shake 0.5s;
+}
+</style>
+
 <template>
-    <Head title="Register" />
+    <div class="min-h-screen flex overflow-hidden">
+        <div
+            class="w-1/2 bg-cover bg-center relative overflow-hidden"
+            :style="{ backgroundImage: `url('/images/Background.png')` }"
+        >
+            <div
+                v-for="particle in particles"
+                :key="particle.id"
+                class="absoulte rounded-full bg-white bg-opacity-20 animate-float"
+                :style="{
+                    left: `${particle.x}%`,
+                    top: `${particle.y}%`,
+                    width: `${particle.size}px`,
+                    height: `${particle.size}px`,
+                    animationDelay: `${particle.delay}s`,
+                }"
+            ></div>
 
-    <AuthenticationCard>
-        <template #logo>
-            <AuthenticationCardLogo />
-        </template>
-
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="name" value="Name" />
-                <TextInput
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-                <InputError class="mt-2" :message="form.errors.name" />
+            <!-- Overlay Konten dengan Animasi -->
+            <div
+                class="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black"
+            >
+                <div
+                    class="text-white text-center transform transition-all duration-1000 ease-in-out"
+                    :class="{
+                        'translate-x-0 opacity-100': isAnimationComplete,
+                        '-translate-x-10 opacity-0': !isAnimationComplete,
+                    }"
+                >
+                    <h1 class="text-4xl font-bold mb-4 animate-fade-in">
+                        Finance Management System
+                    </h1>
+                    <p class="text-xl animate-fade-in-delay">
+                        Kelola Keuangan Anda dengan Mudah
+                    </p>
+                </div>
             </div>
+        </div>
+        <div class="w-1/2 flex items-center justify-center bg-gray-100 p-8">
+            <div
+                class="w-full max-w-md transform transition-all duration-1000 ease-in-out"
+                :class="{
+                    'translate-x-0 opacity-100': isAnimationComplete,
+                    'translate-x-10 opacity-0': !isAnimationComplete,
+                }"
+            >
+                <h2
+                    class="text-2xl font-bold mb-6 text-center animate-slide-in"
+                >
+                    Let's Start Your Journey!
+                </h2>
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+                <!-- Tombol Login Sosial Media dalam Dua Baris -->
+                <div class="mb-4 space-y-3 animate-slide-in-delay">
+                    <div class="flex space-x-3">
+                        <button
+                            @click="loginWithGoogle"
+                            class="flex-1 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-md px-2 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48"
+                            >
+                                <path
+                                    fill="#4285F4"
+                                    d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+                                />
+                                <path
+                                    fill="#34A853"
+                                    d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.32-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+                                />
+                                <path
+                                    fill="#FBBC05"
+                                    d="M11.68 28.18c-1.11-3.3-1.11-6.88 0-10.18V12.3H4.34A23.952 23.952 0 0 0 0 24c0 3.86.93 7.5 2.59 10.7l7.09-5.52z"
+                                />
+                                <path
+                                    fill="#EA4335"
+                                    d="M24 9.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 3.21 29.72 1 24 1 15.4 1 7.96 5.93 4.34 14.3l7.34 5.7C13.42 13.62 18.27 9.75 24 9.75z"
+                                />
+                            </svg>
+                            Google
+                        </button>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
-            </div>
-
-            <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
-                <InputLabel for="terms">
-                    <div class="flex items-center">
-                        <Checkbox id="terms" v-model:checked="form.terms" name="terms" required />
-
-                        <div class="ms-2">
-                            I agree to the <a target="_blank" :href="route('terms.show')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Terms of Service</a> and <a target="_blank" :href="route('policy.show')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Privacy Policy</a>
-                        </div>
+                        <button
+                            @click="loginWithFacebook"
+                            class="flex-1 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-md px-2 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48"
+                            >
+                                <path
+                                    fill="#3F51B5"
+                                    d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20S35.046 4 24 4z"
+                                />
+                                <path
+                                    fill="#FFF"
+                                    d="M29.707 19.5h-4.207v-4c0-1.104.896-2 2-2h2V9h-4a6 6 0 0 0-6 6v4.5h-4v6h4V39h7v-13.5h4.293l1-6z"
+                                />
+                            </svg>
+                            Facebook
+                        </button>
                     </div>
-                    <InputError class="mt-2" :message="form.errors.terms" />
-                </InputLabel>
-            </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Already registered?
-                </Link>
+                    <div class="flex space-x-3">
+                        <button
+                            @click="loginWithGithub"
+                            class="flex-1 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-md px-2 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
+                        >
+                            <svg
+                                class="w-6 h-6 text-gray-800 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    fill="#000"
+                                    d="M12.006 2a9.847 9.847 0 0 0-6.484 2.44 10.32 10.32 0 0 0-3.393 6.17 10.48 10.48 0 0 0 1.317 6.955 10.045 10.045 0 0 0 5.4 4.418c.504.095.683-.223.683-.494 0-.245-.01-1.052-.014-1.908-2.78.62-3.366-1.21-3.366-1.21a2.711 2.711 0 0 0-1.11-1.5c-.907-.637.07-.621.07-.621.317.044.62.163.885.346.266.183.487.426.647.71.135.253.318.476.538.655a2.079 2.079 0 0 0 2.37.196c.045-.52.27-1.006.635-1.37-2.219-.259-4.554-1.138-4.554-5.07a4.022 4.022 0 0 1 1.031-2.75 3.77 3.77 0 0 1 .096-2.713s.839-.275 2.749 1.05a9.26 9.26 0 0 1 5.004 0c1.906-1.325 2.74-1.05 2.74-1.05.37.858.406 1.828.101 2.713a4.017 4.017 0 0 1 1.029 2.75c0 3.939-2.339 4.805-4.564 5.058a2.471 2.471 0 0 1 .679 1.897c0 1.372-.012 2.477-.012 2.814 0 .272.18.592.687.492a10.05 10.05 0 0 0 5.388-4.421 10.473 10.473 0 0 0 1.313-6.948 10.32 10.32 0 0 0-3.39-6.165A9.847 9.847 0 0 0 12.007 2Z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                            GitHub
+                        </button>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
-                </PrimaryButton>
+                        <button
+                            @click="loginWithLinkedIn"
+                            class="flex-1 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-md px-2 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 48 48"
+                            >
+                                <path
+                                    fill="#0077B5"
+                                    d="M42,37c0,2.762-2.238,5-5,5H11c-2.762,0-5-2.238-5-5V11c0-2.762,2.238-5,5-5h26c2.762,0,5,2.238,5,5V37z"
+                                />
+                                <path
+                                    fill="#FFF"
+                                    d="M12 19h5v17h-5zm2.485-2h.035c1.752 0 2.836-1.163 2.836-2.61C17.321 13.95 16.268 13 14.534 13c-1.736 0-2.836 1.009-2.836 2.614C11.698 17.437 12.734 18.5 14.485 18.5zM36 36h-5v-9.1c0-2.398-1.215-4.084-3.342-4.084-1.736 0-2.706 1.182-3.158 2.325-.162.395-.2.94-.2 1.494V36h-5V19h5v2.645h.07c.816-1.406 2.542-2.81 5.241-2.81 3.558 0 6.362 2.344 6.362 7.393V36z"
+                                />
+                            </svg>
+                            LinkedIn
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pembatas -->
+                <div class="relative my-4 animate-slide-in-delay-2">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <span class="bg-gray-100 px-3 text-gray-500">Or</span>
+                    </div>
+                </div>
+
+                <form @submit.prevent="submit" class="space-y-4">
+                    <div class="animate-slide-in-delay-3">
+                        <InputLabel for="name" value="Name" />
+                        <TextInput
+                            id="name"
+                            v-model="form.name"
+                            type="text"
+                            class="mt-1 block w-full"
+                            required
+                            autofocus
+                            autocomplete="name"
+                        />
+                        <InputError :message="form.errors.name" class="mt-2" />
+                    </div>
+                    <div class="animate-slide-in-delay-4">
+                        <InputLabel for="email" value="Email" />
+                        <TextInput
+                            id="email"
+                            v-model="form.email"
+                            type="email"
+                            class="mt-1 block w-full"
+                            required
+                            autocomplete="username"
+                        />
+                        <InputError :message="form.errors.email" class="mt-2" />
+                    </div>
+                    <div class="animate-slide-in-delay-4">
+                        <InputLabel for="password" value="Password" />
+                        <div class="relative">
+                            <TextInput
+                                id="password"
+                                v-model="form.password"
+                                :type="showPassword ? 'text' : 'password'"
+                                class="mt-1 block w-full pr-10"
+                                required
+                                autocomplete="new-password"
+                            />
+                            <button
+                                type="button"
+                                @click="togglePasswordVisibility"
+                                class="absolute inset-y-0 right-0 flex items-center px-3"
+                            >
+                                <EyeIcon
+                                    v-if="!showPassword"
+                                    class="h-5 w-5 text-gray-400"
+                                />
+                                <EyeOffIcon
+                                    v-else
+                                    class="h-5 w-5 text-gray-400"
+                                />
+                            </button>
+                        </div>
+                        <InputError
+                            :message="form.errors.password"
+                            class="mt-2"
+                        />
+                    </div>
+                    <!-- <div class="animate-slide-in-delay-4">
+                        <InputLabel
+                            for="password_confirmation"
+                            value="Confirm Password"
+                        />
+                        <div class="relative">
+                            <TextInput
+                                id="password_confirmation"
+                                v-model="form.password_confirmation"
+                                :type="
+                                    showConfirmPassword ? 'text' : 'password'
+                                "
+                                class="mt-1 block w-full pr-10"
+                                required
+                                autocomplete="new-password"
+                            />
+                            <button
+                                type="button"
+                                @click="toggleConfirmPasswordVisibility"
+                                class="absolute inset-y-0 right-0 flex items-center px-3"
+                            >
+                                <EyeIcon
+                                    v-if="!showConfirmPassword"
+                                    class="h-5 w-5 text-gray-400"
+                                />
+                                <EyeOffIcon
+                                    v-else
+                                    class="h-5 w-5 text-gray-400"
+                                />
+                            </button>
+                        </div>
+                        <InputError
+                            class="mt-2"
+                            :message="form.errors.password_confirmation"
+                        />
+                    </div> -->
+
+                    <div class="animate-slide-in-delay-6">
+                        <button
+                            type="submit"
+                            class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline hover:bg-indigo-700 transition-colors duration-300 transform hover:scale-105"
+                            :disabled="form.processing"
+                        >
+                            {{ form.processing ? "Memproses..." : "Sign Up" }}
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4 animate-fade-in-delay">
+                    <p class="text-gray-600">
+                        Already Have an Account?
+                        <Link
+                            :href="route('login')"
+                            class="text-indigo-500 hover:text-indigo-700 font-bold transition-colors"
+                        >
+                            Login Here
+                        </Link>
+                    </p>
+                </div>
+
             </div>
-        </form>
-    </AuthenticationCard>
+        </div>
+    </div>
 </template>
